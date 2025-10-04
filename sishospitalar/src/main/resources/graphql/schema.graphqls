@@ -1,0 +1,25 @@
+type Consulta {
+    id: ID!
+    dataHora: String!
+    medico: Usuario!
+    enfermeiro: Usuario
+    paciente: Usuario!
+    observacoes: String
+}
+
+type Usuario {
+    id: ID!
+    nome: String!
+    email: String!
+    perfil: String!
+}
+
+type Query {
+    consultasPorPaciente(pacienteId: ID!): [Consulta]
+    consultasFuturas: [Consulta]
+}
+
+type Mutation {
+    criarConsulta(pacienteId: ID!, medicoId: ID!, dataHora: String!, observacoes: String): Consulta
+    atualizarConsulta(consultaId: ID!, observacoes: String): Consulta
+}
