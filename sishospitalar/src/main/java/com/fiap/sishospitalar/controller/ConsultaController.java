@@ -70,9 +70,17 @@ public class ConsultaController {
 		Usuario paciente = usuarioRepository.findById(pacienteId)
 				.orElseThrow(() -> new PacienteNaoEncontradoException("Paciente não encontrado"));
 
+		if(!Perfil.PACIENTE.name().equals(paciente.getPerfil().name())) {
+			throw new PacienteNaoEncontradoException("Paciente não encontrado");
+		}
+		
 		Usuario medico = usuarioRepository.findById(medicoId)
 				.orElseThrow(() -> new MedicoNaoEncontradoException("Médico não encontrado"));
 
+		if(!Perfil.MEDICO.name().equals(medico.getPerfil().name())) {
+			throw new MedicoNaoEncontradoException("Médico não encontrado");
+		}
+		
 		Consulta consulta = new Consulta();
 		consulta.setPaciente(paciente);
 		consulta.setMedico(medico);

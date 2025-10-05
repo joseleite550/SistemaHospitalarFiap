@@ -23,15 +23,11 @@ public class NotificacaoService {
     
 	@RabbitListener(queues = RabbitConfig.NOVA_CONSULTA)
 	public void novaConsulta(Consulta consulta) {
-		System.out.println("Nova notificação de consulta para o paciente: " + consulta.getPaciente().getNome());
-		System.out.println("Consulta marcada");
 		enviarEmail(consulta,"Consulta marcada");
 	}
 
 	@RabbitListener(queues = RabbitConfig.ATUALIZAR_CONSULTA)
 	public void atualizarConsulta(Consulta consulta) {
-		System.out.println("Nova notificação de consulta para o paciente: " + consulta.getPaciente().getNome());
-		System.out.println("Consulta atualizada");
 		enviarEmail(consulta,"Consulta atualizada");
 	}
 
@@ -46,6 +42,8 @@ public class NotificacaoService {
 	}
 
 	private void enviarEmail(Consulta consulta, String assunto) {
+		System.out.println("Nova notificação de consulta para o paciente: " + consulta.getPaciente().getNome());
+		System.out.println(assunto);
 		System.out.println("Email enviado para: " + consulta.getPaciente().getEmail());
 	}
 }
