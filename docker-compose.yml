@@ -2,42 +2,41 @@ version: "3.8"
 
 services:
   agendamento:
-    build: 
-      context: ./sishospitalar
-    container_name: sishospitalar
-    ports:
-      - "8080:8080"
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_DATASOURCE_URL: jdbc:h2:mem:sishospitalar
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hospitalar
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
     depends_on:
       - rabbitmq
+      - db
 
   notificacoes:
-    build: 
-      context: ./sishospitalar-notificacoes
-    container_name: sishospitalar-notificacoes
-    ports:
-      - "8081:8081"
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_DATASOURCE_URL: jdbc:h2:mem:locatech
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hospitalar
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
     depends_on:
       - rabbitmq
       - agendamento
-    
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
+      - db
+      
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
     ports:
-      - "5672:5672"     
-      - "15672:15672"
+      - "5432:5432"
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      POSTGRES_DB: hospitalar
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+      - db_data:/var/lib/postgresql/data
     restart: unless-stopped
+
+  rabbitmq:
 
 volumes:
   rabbitmq_data:
+  db_data:
