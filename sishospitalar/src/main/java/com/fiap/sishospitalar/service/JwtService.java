@@ -5,9 +5,10 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import com.fiap.sishospitalar.config.JwtConfigProperties;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -19,18 +20,21 @@ import io.jsonwebtoken.security.Keys;
 @SuppressWarnings("deprecation")
 @Service
 public class JwtService {
-	@Value("${jwt.secret}")
-	private String secret;
-	@Value("${jwt.expiration-ms}")
-	private long expirationMs;
+	
+    private final JwtConfigProperties jwtConfigProperties; // << NOVO CAMPO INJETADO
+
+    public JwtService(JwtConfigProperties jwtConfigProperties) {
+        this.jwtConfigProperties = jwtConfigProperties;
+    }
 
 	private Key getSigningKey() {
-		return Keys.hmacShaKeyFor(secret.getBytes());
+		// Use o getter da nova classe
+		return Keys.hmacShaKeyFor(jwtConfigProperties.getSecret().getBytes());
 	}
 
 	public String gerarToken(UserDetails userDetails) {
 		Date agora = new Date();
-		Date validade = new Date(agora.getTime() + expirationMs);
+		Date validade = new Date(agora.getTime() + jwtConfigProperties.getExpirationMs()); 
 
 		return Jwts.builder()
 				.setSubject(userDetails.getUsername())
