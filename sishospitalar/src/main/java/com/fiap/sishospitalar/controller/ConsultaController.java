@@ -7,9 +7,15 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 
+import com.fiap.sishospitalar.exceptions.MedicoNaoEncontradoException;
+import com.fiap.sishospitalar.exceptions.PacienteNaoEncontradoException;
 import com.fiap.sishospitalar.model.Consulta;
+import com.fiap.sishospitalar.model.Perfil;
 import com.fiap.sishospitalar.model.Usuario;
 import com.fiap.sishospitalar.repository.UsuarioRepository;
 import com.fiap.sishospitalar.service.AgendamentoService;
@@ -25,9 +31,28 @@ public class ConsultaController {
 		this.usuarioRepository = usuarioRepository;
 	}
 
-	@PreAuthorize("hasRole('PACIENTE') or hasRole('MEDICO') or hasRole('ENFERMEIRO')")
+	@PreAuthorize("isAuthenticated()")
 	@QueryMapping
 	public List<Consulta> consultasPorPaciente(@Argument Long pacienteId) {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		// Obtém o email/username do JWT
+		String userEmail = ((User) auth.getPrincipal()).getUsername();
+
+		Usuario usuarioLogado = usuarioRepository.findByEmail(userEmail)
+				.orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + userEmail));
+		
+		if (usuarioLogado.getPerfil() == Perfil.PACIENTE) {
+			if (pacienteId != null && !pacienteId.equals(usuarioLogado.getId())) {
+				throw new SecurityException("Acesso negado: Pacientes só podem ver suas próprias consultas.");
+			}
+			return agendamentoService.listarConsultasPorPaciente(usuarioLogado.getId());
+		}
+		
+		if (pacienteId == null) {
+			throw new IllegalArgumentException("O ID do paciente é obrigatório para Médicos e Enfermeiros.");
+		}
+		
 		return agendamentoService.listarConsultasPorPaciente(pacienteId);
 	}
 
@@ -43,10 +68,10 @@ public class ConsultaController {
 			@Argument String observacoes) {
 
 		Usuario paciente = usuarioRepository.findById(pacienteId)
-				.orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
+				.orElseThrow(() -> new PacienteNaoEncontradoException("Paciente não encontrado"));
 
 		Usuario medico = usuarioRepository.findById(medicoId)
-				.orElseThrow(() -> new RuntimeException("Médico não encontrado"));
+				.orElseThrow(() -> new MedicoNaoEncontradoException("Médico não encontrado"));
 
 		Consulta consulta = new Consulta();
 		consulta.setPaciente(paciente);
