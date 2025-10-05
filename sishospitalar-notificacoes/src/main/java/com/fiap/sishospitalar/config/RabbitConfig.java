@@ -7,6 +7,7 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 @Configuration
@@ -32,12 +33,12 @@ public class RabbitConfig {
     }
 
     @Bean
-    Binding bindingNovaConsulta(Queue filaNovaConsulta, TopicExchange consultaExchange) {
+    Binding bindingNovaConsulta(@Qualifier("filaNovaConsulta") Queue filaNovaConsulta, TopicExchange consultaExchange) {
         return BindingBuilder.bind(filaNovaConsulta).to(consultaExchange).with(NOVA_CONSULTA);
     }
 
     @Bean
-    Binding bindingAtualizarConsulta(Queue filaAtualizarConsulta, TopicExchange consultaExchange) {
+    Binding bindingAtualizarConsulta(@Qualifier("filaAtualizarConsulta") Queue filaAtualizarConsulta, TopicExchange consultaExchange) {
         return BindingBuilder.bind(filaAtualizarConsulta).to(consultaExchange).with(ATUALIZAR_CONSULTA);
     }
 
