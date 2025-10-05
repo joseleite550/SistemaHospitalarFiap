@@ -1,6 +1,31 @@
 version: "3.8"
 
 services:
+  agendamento:
+    build: 
+      context: ./sishospitalar
+    container_name: sishospitalar
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_DATASOURCE_URL: jdbc:h2:mem:sishospitalar
+    depends_on:
+      - rabbitmq
+
+  notificacoes:
+    build: 
+      context: ./sishospitalar-notificacoes
+    container_name: sishospitalar-notificacoes
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_DATASOURCE_URL: jdbc:h2:mem:locatech
+    depends_on:
+      - rabbitmq
+      - agendamento
+    
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
