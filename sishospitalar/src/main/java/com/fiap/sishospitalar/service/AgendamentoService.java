@@ -35,6 +35,14 @@ public class AgendamentoService {
 		return updated;
 	}
 
+	public void cancelarConsulta(Long consultaId) {
+		Consulta consulta = consultaRepository.findById(consultaId)
+				.orElseThrow(() -> new ConsultaNaoEncontradaException("Consulta não encontrada com ID: " + consultaId));
+
+		rabbitTemplate.convertAndSend(RabbitConfig.CONSULTA_EXCHANGE, RabbitConfig.CANCELAR_CONSULTA, consulta);
+		consultaRepository.delete(consulta);
+	}
+
 	public List<Consulta> listarConsultasPorPaciente(Long pacienteId) {
 		return consultaRepository.findByPacienteId(pacienteId);
 	}
@@ -44,6 +52,7 @@ public class AgendamentoService {
 	}
 
 	public Consulta buscarPorId(Long id) {
-		return consultaRepository.findById(id).orElseThrow(() -> new ConsultaNaoEncontradaException("Consulta não encontrada com ID: " + id));
+		return consultaRepository.findById(id)
+				.orElseThrow(() -> new ConsultaNaoEncontradaException("Consulta não encontrada com ID: " + id));
 	}
 }

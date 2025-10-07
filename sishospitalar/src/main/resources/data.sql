@@ -24,4 +24,4 @@ INSERT INTO usuarios (nome, email, senha, perfil) VALUES
 ('Paciente Teste', 'paciente@fiap.com', '$2a$10$tJ9fP.n.v.rY1f8gZ8n2S.m4xN8qL2Fp.8hT.0g2P0g8K7D.g6D7t', 'PACIENTE');
 
 INSERT INTO consultas (data_hora, medico_id, paciente_id, observacoes) VALUES
-('2028-11-10 14:00:00', 1, 3, 'Primeira consulta bara base de teste');
+(CURRENT_DATE + interval '1 day' + time '14:00:00', 1, 3, 'Primeira consulta base teste');

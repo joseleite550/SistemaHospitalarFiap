@@ -22,4 +22,5 @@ type Query {
 type Mutation {
     criarConsulta(pacienteId: ID!, medicoId: ID!, dataHora: String!, observacoes: String): Consulta
     atualizarConsulta(consultaId: ID!, observacoes: String): Consulta
+    cancelarConsulta(consultaId: ID!): ID
 }

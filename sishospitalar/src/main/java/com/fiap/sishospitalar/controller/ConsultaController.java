@@ -99,4 +99,11 @@ public class ConsultaController {
 
 		return agendamentoService.atualizarConsulta(consulta);
 	}
+	
+    @PreAuthorize("hasRole('MEDICO') or hasRole('ENFERMEIRO')")
+	@MutationMapping
+	public Long cancelarConsulta(@Argument Long consultaId) {
+		agendamentoService.cancelarConsulta(consultaId);
+		return consultaId;
+	}
 }

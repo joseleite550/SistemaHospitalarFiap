@@ -30,7 +30,15 @@ public class NotificacaoService {
 	public void atualizarConsulta(Consulta consulta) {
 		enviarEmail(consulta,"Consulta atualizada");
 	}
+	
+	@RabbitListener(queues = RabbitConfig.CANCELAR_CONSULTA)
+	public void cancelarConsulta(Consulta consulta) {
+		enviarEmail(consulta,"Consulta cancelada");
+	}
 
+	/**
+	 * Simula busca de tempos em tempos para notificar paciente
+	 */
 	@Scheduled(fixedRate = 30000)
 	public void enviarLembretesDiarios() {
 		LocalDateTime agora = LocalDateTime.now();

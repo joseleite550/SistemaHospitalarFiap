@@ -16,6 +16,7 @@ public class RabbitConfig {
     public static final String NOVA_CONSULTA = "nova-consulta";
     public static final String ATUALIZAR_CONSULTA = "atualizar-consulta";
     public static final String CONSULTA_EXCHANGE = "consulta-exchange";
+    public static final String CANCELAR_CONSULTA = "cancelar-consulta";
 
     @Bean
     TopicExchange consultaExchange() {
@@ -41,6 +42,12 @@ public class RabbitConfig {
     Binding bindingAtualizarConsulta(@Qualifier("filaAtualizarConsulta") Queue filaAtualizarConsulta, TopicExchange consultaExchange) {
         return BindingBuilder.bind(filaAtualizarConsulta).to(consultaExchange).with(ATUALIZAR_CONSULTA);
     }
+    
+	@Bean
+	Binding bindingCancelarConsulta(@Qualifier("filaCancelarConsulta") Queue filaCancelarConsulta,
+			TopicExchange consultaExchange) {
+		return BindingBuilder.bind(filaCancelarConsulta).to(consultaExchange).with(CANCELAR_CONSULTA);
+	}
 
     @Bean
     Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
