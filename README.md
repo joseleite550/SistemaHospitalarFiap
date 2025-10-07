@@ -97,5 +97,6 @@ A comunicação entre o `sishospitalar-agendamento` (Produtor) e o `sishospitala
 
 
 **Autores**
-José Franklin Miranda Gomes Leite RA 361614
-Vitor Henrique dos Santos  RA 361617
+
+* José Franklin Miranda Gomes Leite RA 361614
+* Vitor Henrique dos Santos  RA 361617
