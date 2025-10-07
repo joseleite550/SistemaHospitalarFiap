@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.fiap.sishospitalar.config.RabbitConfig;
 import com.fiap.sishospitalar.model.Consulta;
+import com.fiap.sishospitalar.model.Perfil;
 import com.fiap.sishospitalar.model.Usuario;
 import com.fiap.sishospitalar.repository.ConsultaRepository;
 
@@ -51,6 +52,8 @@ public class NotificacaoService {
 //				.forEach(c -> enviarEmail(c, "Lembrete de consulta amanhã"));
 		
 		Usuario usuario = new Usuario();
+		usuario.setPerfil(Perfil.PACIENTE);
+		usuario.setNome("Paciente criado em código");
 		usuario.setEmail("teste.disparo.automatico.fiap.com");
 		Consulta consultaExemplo = new Consulta();
 		consultaExemplo.setPaciente(usuario);
