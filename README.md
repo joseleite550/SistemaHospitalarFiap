@@ -58,6 +58,8 @@ O projeto é configurado para ser executado de forma completa utilizando Docker 
 
 O arquivo **`Fiap Sistema Hospitalar FASE 3.postman_collection.json`** contém todos os testes para validar os requisitos funcionais e de segurança do sistema.
 
+Ou acesse https://documenter.getpostman.com/view/19364354/2sB3QJNAtj
+
 ### Configuração do Postman
 
 1.  **Importe a Collection:** Importe o arquivo JSON fornecido para o seu Postman.
