@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.fiap.sishospitalar.config.RabbitConfig;
 import com.fiap.sishospitalar.model.Consulta;
+import com.fiap.sishospitalar.model.Usuario;
 import com.fiap.sishospitalar.repository.ConsultaRepository;
 
 @Service
@@ -41,12 +42,19 @@ public class NotificacaoService {
 	 */
 	@Scheduled(fixedRate = 30000)
 	public void enviarLembretesDiarios() {
-		LocalDateTime agora = LocalDateTime.now();
-		LocalDateTime daqui1Dia = agora.plusDays(1);
-
-		List<Consulta> futuras = consultaRepository.findByDataHoraAfter(agora);
-		futuras.stream().filter(c -> !c.getDataHora().isBefore(agora) && c.getDataHora().isBefore(daqui1Dia))
-				.forEach(c -> enviarEmail(c, "Lembrete de consulta amanhã"));
+		// Código comentado e fixo um exemplo somente para gerar logs no serviço de notificacao
+//		LocalDateTime agora = LocalDateTime.now();
+//		LocalDateTime daqui1Dia = agora.plusDays(1);
+//
+//		List<Consulta> futuras = consultaRepository.findByDataHoraAfter(agora);
+//		futuras.stream().filter(c -> !c.getDataHora().isBefore(agora) && c.getDataHora().isBefore(daqui1Dia))
+//				.forEach(c -> enviarEmail(c, "Lembrete de consulta amanhã"));
+		
+		Usuario usuario = new Usuario();
+		usuario.setEmail("teste.disparo.automatico.fiap.com");
+		Consulta consultaExemplo = new Consulta();
+		consultaExemplo.setPaciente(usuario);
+		enviarEmail(consultaExemplo, "Lembrete de consulta amanhã");
 	}
 
 	private void enviarEmail(Consulta consulta, String assunto) {
