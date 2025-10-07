@@ -1,0 +1,933 @@
+{
+	"info": {
+		"_postman_id": "f87063a8-db6d-4092-b45d-b880d4b71b53",
+		"name": "Fiap Sistema Hospitalar FASE 3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19364354",
+		"_collection_link": "https://lively-desert-29202.postman.co/workspace/Jose-~c0cde2ac-c8e4-4fc9-92bb-8a49fa4a61a1/collection/19364354-f87063a8-db6d-4092-b45d-b880d4b71b53?action=share&source=collection_link&creator=19364354"
+	},
+	"item": [
+		{
+			"name": "01 - Médico",
+			"item": [
+				{
+					"name": "01 - Autenticação (REST)",
+					"item": [
+						{
+							"name": "Registro",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();\r",
+											"pm.environment.set(\"medicoId\",jsonData.id)\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"med.teste@fiap.com.br\",\n    \"senha\": \"senha123\",\n    \"nome\": \"Médico teste\",\n    \"perfil\": \"MEDICO\" \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								},
+								"description": "Cadastra um novo usuário. Use os perfis: ROLE_MEDICO, ROLE_ENFERMEIRO ou ROLE_PACIENTE."
+							},
+							"response": []
+						},
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();\r",
+											"pm.environment.set(\"tokenMedico\",jsonData.token)\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "aut",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"med.teste@fiap.com.br\",\n    \"senha\": \"senha123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "Autentica o usuário e retorna o token JWT, que deve ser usado no Authorization Header das requisições GraphQL."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "02 - Consultas (GraphQL)",
+					"item": [
+						{
+							"name": "Consultas por Paciente",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenMedico}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query ConsultasPaciente(\n    $pacienteId: ID!\n) {\n  consultasPorPaciente(pacienteId: $pacienteId) {\n    id\n    dataHora\n    observacoes\n    medico {\n      id\n      nome\n    }\n    enfermeiro {\n      id\n      nome\n    }\n  }\n}",
+										"variables": "{\r\n  \"pacienteId\": {{pacienteId}}\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Lista consultas de um paciente. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						},
+						{
+							"name": "Consultas Futuras",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenMedico}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query ConsultasFuturas {\n  consultasFuturas {\n    id\n    dataHora\n    observacoes\n    paciente {\n      id\n      nome\n    }\n  }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Lista todas as consultas futuras. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						},
+						{
+							"name": "Criar Consulta",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenMedico}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation CriarConsulta(\n    $pacienteId: ID!,\n    $medicoId: ID!,\n    $dataHora: String!,\n    $observacoes: String\n) {\n  criarConsulta(\n    pacienteId: $pacienteId,\n    medicoId: $medicoId, \n    dataHora: $dataHora,\n    observacoes: $observacoes\n  ) {\n    id\n    dataHora\n    observacoes\n  }\n}",
+										"variables": "{\r\n  \"pacienteId\": {{pacienteId}},  \r\n  \"medicoId\": {{medicoId}},      \r\n  \"dataHora\": \"2025-11-06T21:48:00\",\r\n  \"observacoes\": \"Exame de rotina anual.\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Cria uma nova consulta. Use um pacienteId e medicoId válidos. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						},
+						{
+							"name": "Atualizar Consulta",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenMedico}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation AtualizarConsulta($consultaId: ID!, $obs: String) {\n  atualizarConsulta(consultaId: $consultaId, observacoes:$obs) {\n    id\n    observacoes\n  }\n}",
+										"variables": "{\r\n  \"consultaId\": 1,\r\n  \"obs\":\"Atualização de agendamento\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Atualiza as observações de uma consulta existente. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						},
+						{
+							"name": "Cancelar Consulta",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenMedico}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation CancelarConsulta($consultaId: ID!) {\n  cancelarConsulta(consultaId: $consultaId) \n}",
+										"variables": "{\r\n  \"consultaId\": 1"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Atualiza as observações de uma consulta existente. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "02 - Enfermeiro",
+			"item": [
+				{
+					"name": "01 - Autenticação (REST)",
+					"item": [
+						{
+							"name": "Registro",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();\r",
+											"pm.environment.set(\"enfermeiroId\",jsonData.id)\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"enf.teste@fiap.com.br\",\n    \"senha\": \"senha123\",\n    \"nome\": \"Enfermeiro Teste\",\n    \"perfil\": \"ENFERMEIRO\" \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								},
+								"description": "Cadastra um novo usuário. Use os perfis: ROLE_MEDICO, ROLE_ENFERMEIRO ou ROLE_PACIENTE."
+							},
+							"response": []
+						},
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();\r",
+											"pm.environment.set(\"tokenEnfermeiro\",jsonData.token)\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "aut",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"enf.teste@fiap.com.br\",\n    \"senha\": \"senha123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "Autentica o usuário e retorna o token JWT, que deve ser usado no Authorization Header das requisições GraphQL."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "02 - Consultas (GraphQL)",
+					"item": [
+						{
+							"name": "Consultas por Paciente",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenEnfermeiro}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query ConsultasPaciente(\n    $pacienteId: ID!\n) {\n  consultasPorPaciente(pacienteId: $pacienteId) {\n    id\n    dataHora\n    observacoes\n    medico {\n      id\n      nome\n    }\n    enfermeiro {\n      id\n      nome\n    }\n  }\n}",
+										"variables": "{\r\n  \"pacienteId\": {{pacienteId}}\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Lista consultas de um paciente. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						},
+						{
+							"name": "Consultas Futuras",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenEnfermeiro}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query ConsultasFuturas {\n  consultasFuturas {\n    id\n    dataHora\n    observacoes\n    paciente {\n      id\n      nome\n    }\n  }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Lista todas as consultas futuras. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						},
+						{
+							"name": "Criar Consulta",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenEnfermeiro}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation CriarConsulta(\n    $pacienteId: ID!,\n    $medicoId: ID!,\n    $dataHora: String!,\n    $observacoes: String\n) {\n  criarConsulta(\n    pacienteId: $pacienteId,\n    medicoId: $medicoId, \n    dataHora: $dataHora,\n    observacoes: $observacoes\n  ) {\n    id\n    dataHora\n    observacoes\n  }\n}",
+										"variables": "{\r\n  \"pacienteId\": {{pacienteId}},  \r\n  \"medicoId\": {{medicoId}},      \r\n  \"dataHora\": \"2025-12-20T10:00:00\",\r\n  \"observacoes\": \"Exame de rotina anual.\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Cria uma nova consulta. Use um pacienteId e medicoId válidos. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						},
+						{
+							"name": "Atualizar Consulta",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenEnfermeiro}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation AtualizarConsulta($consultaId: ID!, $obs: String) {\n  atualizarConsulta(consultaId: $consultaId, observacoes:$obs) {\n    id\n    observacoes\n  }\n}",
+										"variables": "{\r\n  \"consultaId\": 1,\r\n  \"obs\":\"Atualização de agendamento\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Atualiza as observações de uma consulta existente. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						},
+						{
+							"name": "Cancelar Consulta",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenEnfermeiro}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation CancelarConsulta($consultaId: ID!) {\n  cancelarConsulta(consultaId: $consultaId) \n}",
+										"variables": "{\r\n  \"consultaId\": 1\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Atualiza as observações de uma consulta existente. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "03 - Paciente",
+			"item": [
+				{
+					"name": "01 - Autenticação (REST)",
+					"item": [
+						{
+							"name": "Registro",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();\r",
+											"pm.environment.set(\"pacienteId\",jsonData.id)\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"pac.teste@fiap.com.br\",\n    \"senha\": \"senha123\",\n    \"nome\": \"Paciente Teste\",\n    \"perfil\": \"PACIENTE\" \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								},
+								"description": "Cadastra um novo usuário. Use os perfis: ROLE_MEDICO, ROLE_ENFERMEIRO ou ROLE_PACIENTE."
+							},
+							"response": []
+						},
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();\r",
+											"pm.environment.set(\"tokenPaciente\",jsonData.token)\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "aut",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"pac.teste@fiap.com.br\",\n    \"senha\": \"senha123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "Autentica o usuário e retorna o token JWT, que deve ser usado no Authorization Header das requisições GraphQL."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "02 - Consultas (GraphQL)",
+					"item": [
+						{
+							"name": "Consultas por Paciente",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenPaciente}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query ConsultasPaciente(\n    $pacienteId: ID!\n) {\n  consultasPorPaciente(pacienteId: $pacienteId) {\n    id\n    dataHora\n    observacoes\n    medico {\n      id\n      nome\n    }\n    enfermeiro {\n      id\n      nome\n    }\n  }\n}",
+										"variables": "{\r\n  \"pacienteId\": {{pacienteId}}\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Lista consultas de um paciente. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						},
+						{
+							"name": "Consultas Futuras",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenPaciente}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query ConsultasFuturas {\n  consultasFuturas {\n    id\n    dataHora\n    observacoes\n    paciente {\n      id\n      nome\n    }\n  }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Lista todas as consultas futuras. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						},
+						{
+							"name": "Criar Consulta",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenPaciente}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation CriarConsulta(\n    $pacienteId: ID!,\n    $medicoId: ID!,\n    $dataHora: String!,\n    $observacoes: String\n) {\n  criarConsulta(\n    pacienteId: $pacienteId,\n    medicoId: $medicoId, \n    dataHora: $dataHora,\n    observacoes: $observacoes\n  ) {\n    id\n    dataHora\n    observacoes\n  }\n}",
+										"variables": "{\r\n  \"pacienteId\": {{pacienteId}},  \r\n  \"medicoId\": {{medicoId}},      \r\n  \"dataHora\": \"2025-12-20T10:00:00\",\r\n  \"observacoes\": \"Exame de rotina anual.\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Cria uma nova consulta. Use um pacienteId e medicoId válidos. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						},
+						{
+							"name": "Atualizar Consulta",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{tokenPaciente}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation AtualizarConsulta {\n  atualizarConsulta(consultaId: 1, observacoes: \"Consulta reagendada para dia 22.\") {\n    id\n    observacoes\n  }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/graphql",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"graphql"
+									]
+								},
+								"description": "Atualiza as observações de uma consulta existente. Requer token JWT no cabeçalho Authorization (Bearer token)."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string",
+			"description": "O host e porta da sua API Spring Boot."
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string",
+			"description": "Token JWT retornado após o login. Preencha aqui ou use o campo Bearer Token de cada requisição."
+		}
+	]
+}
