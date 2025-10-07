@@ -36,7 +36,6 @@ public class ConsultaController {
 	public List<Consulta> consultasPorPaciente(@Argument Long pacienteId) {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		// Obtém o email/username do JWT
 		String userEmail = ((User) auth.getPrincipal()).getUsername();
 
 		Usuario usuarioLogado = usuarioRepository.findByEmail(userEmail)

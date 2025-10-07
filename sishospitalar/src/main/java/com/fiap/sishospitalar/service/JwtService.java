@@ -21,14 +21,13 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 	
-    private final JwtConfigProperties jwtConfigProperties; // << NOVO CAMPO INJETADO
+    private final JwtConfigProperties jwtConfigProperties;
 
     public JwtService(JwtConfigProperties jwtConfigProperties) {
         this.jwtConfigProperties = jwtConfigProperties;
     }
 
 	private Key getSigningKey() {
-		// Use o getter da nova classe
 		return Keys.hmacShaKeyFor(jwtConfigProperties.getSecret().getBytes());
 	}
 
