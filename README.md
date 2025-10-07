@@ -94,3 +94,8 @@ A comunicação entre o `sishospitalar-agendamento` (Produtor) e o `sishospitala
 
 1.  O `AgendamentoService` publica mensagens no `consulta-exchange` com as chaves de roteamento (`routing keys`): `nova-consulta`, `atualizar-consulta` ou `cancelar-consulta`.
 2.  O `NotificacaoService` consome as mensagens nas filas ligadas a essas chaves (`filaNovaConsulta`, `filaAtualizarConsulta`, `filaCancelarConsulta`), simulando o envio de e-mails para o paciente.
+
+
+**Autores**
+José Franklin Miranda Gomes Leite RA 361614
+Vitor Henrique dos Santos  RA 361617
